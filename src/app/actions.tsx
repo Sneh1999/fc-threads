@@ -15,7 +15,6 @@ export async function saveThread(casts: string[]) {
     member: threadId,
   });
 
-  redirect(`/threads/${threadId}`);
   return uuidv4
 }
 
