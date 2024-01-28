@@ -89,7 +89,10 @@ export async function POST(
 }
 
 // Get request for the initial first cast in the thread
-export async function GET({ params }: { params: { id: string } }) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
   const id = params.id;
   const casts = await getThread(params.id);
   if (casts.length === 0) {
