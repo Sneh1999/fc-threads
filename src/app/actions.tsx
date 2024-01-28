@@ -16,6 +16,7 @@ export async function saveThread(casts: string[]) {
   });
 
   redirect(`/threads/${threadId}`);
+  return uuidv4
 }
 
 export async function getThread(id: string): Promise<string[]> {

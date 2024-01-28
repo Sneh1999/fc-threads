@@ -1,10 +1,18 @@
 "use client";
 import { useState } from "react";
+import { saveThread } from "./actions";
 
 export default function Home() {
   const [casts, setCasts] = useState<string[]>([""]);
 
-  const saveThread = () => {};
+  const storeThread = async() => {
+    try {
+      const uuid =  await saveThread(casts);
+      console.log(uuid)
+    } catch (e) {
+      console.error(e)
+    }
+  };
 
   const onAddCast = () => {
     const newCasts = [...casts, ""];
@@ -73,7 +81,7 @@ export default function Home() {
           </button>
           <button
             className=" bg-green-500 text-white font-bold px-4 py-2  rounded-lg "
-            onClick={saveThread}
+            onClick={storeThread}
           >
             Submit
           </button>
