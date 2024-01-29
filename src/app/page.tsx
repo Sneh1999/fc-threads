@@ -4,7 +4,6 @@ import { useState } from "react";
 export default function Home() {
   const [casts, setCasts] = useState<string[]>([""]);
   const [loading, setLoading] = useState<boolean>(false);
-  const [threadId, setThreadId] = useState<string>();
 
   const storeThread = async () => {
     try {
@@ -16,7 +15,7 @@ export default function Home() {
         }),
       });
       const { threadId } = await res.json();
-      setThreadId(threadId);
+      window.alert(`Post this on Farcaster: ${"https://fc-threads.vercel.app/" + "thread/" +  threadId} `)
     } catch (e) {
       console.error(e);
     } finally {
