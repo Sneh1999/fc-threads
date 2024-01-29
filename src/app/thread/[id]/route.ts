@@ -12,7 +12,7 @@ function getNextIndex(index: number, casts: string[], buttonIndex: number) {
   ) {
     return index - 1;
   } else {
-    index + 1;
+    return index + 1;
   }
 }
 
@@ -43,35 +43,34 @@ export async function POST(
     const buttonIndex = resJson.untrustedData.buttonIndex;
     const nextIndex = getNextIndex(index, casts, buttonIndex);
 
-    const imageUrl = `${process.env["HOST"]}/api/image/${params.id}?index=${nextIndex}}`;
-    const hasNextCast = index !== casts.length - 1 && casts.length > index + 1;
-    const hasPrevCast = index !== 0 && casts.length > 1;
+    const imageUrl = `${process.env["HOST"]}/image/${params.id}?index=${nextIndex}`;
+    const hasNextCast =
+      nextIndex !== casts.length - 1 && casts.length > nextIndex + 1;
+    const hasPrevCast = nextIndex !== 0 && casts.length > 1;
+
+    const buttons = [];
+    if (hasPrevCast) buttons.push("<-");
+    if (hasNextCast) buttons.push("->");
 
     return new Response(
       `
-            <!DOCTYPE html>
-                <html>
-                <head>
-                    <title>Thread</title>
-                    <meta property="og:title" content="Thread">
-                    <meta property="og:image" content=${imageUrl}>
-                    <meta name="fc:frame" content="vNext">
-                    <meta name="fc:frame:image" content=">
-                    <meta name="fc:frame:post_url" content="${
-                      process.env["HOST"]
-                    }/api/thread/${params.id}?index=${nextIndex}">
-                    ${
-                      hasPrevCast
-                        ? '<meta name="fc:frame:button:1" content="<-" />'
-                        : ""
-                    }
-                    ${
-                      hasNextCast
-                        ? '<meta name="fc:frame:button:2" content="->"  />'
-                        : ""
-                    }
-                 </head>
-                </html>
+      <!DOCTYPE html>
+      <html>
+      <head>
+          <title>Thread</title>
+          <meta property="og:title" content="Thread" />
+          <meta property="og:image" content="${imageUrl}" />
+          <meta name="fc:frame" content="vNext" />
+          <meta name="fc:frame:image" content="${imageUrl}" />
+          <meta name="fc:frame:post_url" content="${
+            process.env["HOST"]
+          }/thread/${params.id}?index=${nextIndex}" />
+          ${buttons.map(
+            (b, idx) =>
+              `<meta name="fc:frame:button:${idx + 1}" content="${b}" />`
+          )}
+       </head>
+      </html>
         `,
       {
         status: 200,
@@ -106,17 +105,17 @@ export async function GET(
             <html>
                 <head>
                     <title>Thread</title>
-                    <meta property="og:title" content="Thread">
+                    <meta property="og:title" content="Thread" />
                     <meta property="og:image" content="${
                       process.env["HOST"]
-                    }/api/thread/${id}?index=0">
-                    <meta name="fc:frame" content="vNext">
+                    }/image/${id}?index=0" />
+                    <meta name="fc:frame" content="vNext" />
                     <meta name="fc:frame:image" content="${
                       process.env["HOST"]
-                    }/api/thread/${id}?index=0">
+                    }/image/${id}?index=0" />
                     <meta name="fc:frame:post_url" content="${
                       process.env["HOST"]
-                    }/api/thread/${id}?index=0">
+                    }/thread/${id}?index=0" />
                     ${
                       casts.length > 1
                         ? '<meta name="fc:frame:button:1" content="->"  />'

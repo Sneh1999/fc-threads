@@ -1,28 +1,25 @@
 import { NextRequest } from "next/server";
-import sharp from "sharp";
+import { getPNGBuffer, getThread } from "@/app/actions";
 
 export const dynamic = "force-dynamic";
 
-export async function POST(
+export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    const svg = `<svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke-width="1.5"
-    stroke="currentColor"
-    className={w-6 h-6 text-red-500}
-  >
-    <path
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-    />
-  </svg>`;
-    const pngBuffer = await sharp(Buffer.from(svg)).toFormat("png").toBuffer();
+    const searchParams = request.nextUrl.searchParams;
+    const indexString = searchParams.get("index");
+
+    if (!indexString) {
+      return new Response("Missing index", {
+        status: 400,
+      });
+    }
+
+    const thread = await getThread(params.id);
+
+    const pngBuffer = await getPNGBuffer(thread[Number(indexString)]);
 
     return new Response(pngBuffer, {
       status: 200,
@@ -33,5 +30,8 @@ export async function POST(
     });
   } catch (e) {
     console.error(e);
+    return new Response(`Internal Server Error`, {
+      status: 500,
+    });
   }
 }
