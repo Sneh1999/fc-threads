@@ -1,9 +1,12 @@
 "use client";
-import { useState } from "react";
+import { ElementRef, useRef, useState } from "react";
 
 export default function Home() {
   const [casts, setCasts] = useState<string[]>([""]);
   const [loading, setLoading] = useState<boolean>(false);
+  const [linkToCopy, setLinkToCopy] = useState("");
+
+  const copyButtonRef = useRef<ElementRef<"button">>(null);
 
   const storeThread = async () => {
     try {
@@ -15,7 +18,7 @@ export default function Home() {
         }),
       });
       const { threadId } = await res.json();
-      window.alert(`Post this on Farcaster: ${"https://fc-threads.vercel.app/" + "thread/" +  threadId} `)
+      setLinkToCopy(`https://fc-threads.vercel.app/thread/${threadId}`);
     } catch (e) {
       console.error(e);
     } finally {
@@ -26,6 +29,16 @@ export default function Home() {
   const onAddCast = () => {
     const newCasts = [...casts, ""];
     setCasts(newCasts);
+  };
+
+  const copyLink = async () => {
+    await navigator.clipboard.writeText(linkToCopy);
+    if (!copyButtonRef.current) return;
+    copyButtonRef.current.innerText = "Copied!";
+    setTimeout(() => {
+      if (!copyButtonRef.current) return;
+      copyButtonRef.current.innerText = "Copy";
+    }, 3000);
   };
 
   const removeCasts = (index: number) => {
@@ -41,8 +54,8 @@ export default function Home() {
     <div className="flex flex-col items-center justify-start min-h-screen my-20">
       <h1 className="text-5xl font-bold">Thread Caster</h1>
       <p className=" text-gray-400 mt-4 text-sm">
-          Create threads in Farcaster, similar to Twitter
-        </p>
+        Create threads in Farcaster, similar to Twitter
+      </p>
 
       <main className="flex flex-col justify-center items-start max-w-5xl w-full">
         {casts?.map((cast, index) => (
@@ -105,6 +118,18 @@ export default function Home() {
           )}
         </div>
 
+        {linkToCopy && (
+          <div className="flex items-center w-full gap-2">
+            <span className="text-gray-400">{linkToCopy}</span>
+            <button
+              className="px-2 py-1 border rounded-md"
+              ref={copyButtonRef}
+              onClick={copyLink}
+            >
+              Copy
+            </button>
+          </div>
+        )}
       </main>
     </div>
   );
